@@ -1393,7 +1393,7 @@ public class DialogSceneComposerKotlinBuilder {
         }
         if (!hasPreferredWidth && !hasPreferredHeight && Utils.isEqual(preferredWidth, preferredHeight) && !Utils.isEqual(-1,
             preferredWidth)) {
-            builder.add(".preferredSize(%Lf)", preferredWidth);
+            builder.add(".prefSize(%Lf)", preferredWidth);
             hasPreferredWidth = true;
             hasPreferredHeight = true;
         }
