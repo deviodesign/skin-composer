@@ -322,8 +322,8 @@ public class DialogSceneComposerKotlinBuilder {
 
             var builder = CodeBlock.builder();
             var variableName = createVariableName("list", variables);
-            if (!usedVariables.contains(variableName)) builder.add("%T<String> ", classNameGetter.get(List.class));
-            builder.addStatement("%L = %T<>(skin%L)", variableName, classNameGetter.get(List.class),
+            if (!usedVariables.contains(variableName)) builder.add("var ");
+            builder.addStatement("%L = %T<String>(skin%L)", variableName, classNameGetter.get(List.class),
                 list.style.name.equals("default") ? "" : ", \"" + list.style.name + "\"");
 
             if (list.name != null) addSetNameStatement(builder, variableName, list.name);
@@ -382,9 +382,9 @@ public class DialogSceneComposerKotlinBuilder {
 
             var builder = CodeBlock.builder();
             var variableName = createVariableName("selectBox", variables);
-            if (!usedVariables.contains(variableName)) builder.add("%T<String> ", classNameGetter.get(SelectBox.class));
-            builder.addStatement("%L = %T(skin%L)", variableName, classNameGetter.get(SelectBox.class),
-                selectBox.style.name.equals("default") ? "" : ", \"" + selectBox.style.name + "\"");
+            if (!usedVariables.contains(variableName)) builder.add("var ");
+            builder.addStatement("%L = %T<%T>(skin%L)", variableName, classNameGetter.get(SelectBox.class),
+                classNameGetter.get(String.class), selectBox.style.name.equals("default") ? "" : ", \"" + selectBox.style.name + "\"");
 
             if (selectBox.name != null) addSetNameStatement(builder, variableName, selectBox.name);
 
@@ -583,7 +583,7 @@ public class DialogSceneComposerKotlinBuilder {
             var builder = CodeBlock.builder();
             var variableName = createVariableName("container", variables);
             if (!usedVariables.contains(variableName)) builder.add("var ");
-            builder.addStatement("%L = %T()", variableName, classNameGetter.get(Container.class));
+            builder.addStatement("%L = %T<>()", variableName, classNameGetter.get(Container.class));
 
             if (container.name != null) addSetNameStatement(builder, variableName, container.name);
 
@@ -804,7 +804,8 @@ public class DialogSceneComposerKotlinBuilder {
             var builder = CodeBlock.builder();
             var variableName = createVariableName("tree", variables);
             if (!usedVariables.contains(variableName)) builder.add("var ");
-            builder.addStatement("%L = %T(skin%L)", variableName, classNameGetter.get(Tree.class),
+            builder.addStatement("%L = %T<%T, %T>(skin%L)", variableName, classNameGetter.get(Tree.class),
+                nodeClassName, classNameGetter.get(String.class),
                 tree.style.name.equals("default") ? "" : ", \"" + tree.style.name + "\"");
 
             if (tree.name != null) addSetNameStatement(builder, variableName, tree.name);
