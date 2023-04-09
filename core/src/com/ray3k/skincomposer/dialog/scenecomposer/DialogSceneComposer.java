@@ -15,11 +15,11 @@ import com.badlogic.gdx.utils.Array;
 import com.ray3k.skincomposer.Main;
 import com.ray3k.skincomposer.data.StyleProperty;
 import com.ray3k.skincomposer.dialog.DialogListener;
-import com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel.*;
 import com.ray3k.skincomposer.dialog.scenecomposer.menulisteners.*;
 import com.ray3k.skincomposer.utils.IntPair;
 import com.ray3k.stripe.PopTable;
 import com.ray3k.stripe.PopTableClickListener;
+import com.ray3k.stripe.StripeMenu;
 import com.ray3k.stripe.StripeMenuBar;
 import com.ray3k.stripe.StripeMenuBar.KeyboardShortcut;
 
@@ -38,6 +38,7 @@ public class DialogSceneComposer extends Dialog {
     private TextTooltip redoTooltip;
     private TextButton undoButton;
     private TextButton redoButton;
+    private StripeMenu copyClipboardMenu;
     public DialogSceneComposerModel.SimActor simActor;
     private Table propertiesTable;
     private Table pathTable;
@@ -119,6 +120,8 @@ public class DialogSceneComposer extends Dialog {
                         showExportDialog();
                     }
                 })
+                .menu("Copy clipboard", handListener)
+                .parent()
                 .item("Settings", handListener, new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
@@ -131,6 +134,20 @@ public class DialogSceneComposer extends Dialog {
                         events.menuQuit();
                     }
                 });
+
+        copyClipboardMenu = bar.findMenu("File").findMenu("Copy clipboard");
+        copyClipboardMenu.item("Java", handListener, new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                events.exportClipboard();
+            }
+        });
+        copyClipboardMenu.item("Kotlin", handListener, new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                events.exportKotlinClipboard();
+            }
+        });
         
         bar.menu("Scene", handListener)
                 .item("Find by name...", new KeyboardShortcut("Ctrl+F", Keys.F, Keys.CONTROL_LEFT), handListener, new ChangeListener() {
@@ -2204,7 +2221,7 @@ public class DialogSceneComposer extends Dialog {
         
         return root;
     }
-    
+
     public PopTable showExportDialog() {
         var root = new PopTable(skin);
         root.setHideOnUnfocus(true);
@@ -2212,15 +2229,15 @@ public class DialogSceneComposer extends Dialog {
         root.setKeepSizedWithinStage(true);
         root.setKeepCenteredInWindow(true);
         root.pad(20);
-        
+
         var label = new Label("Export", skin, "scene-title-bg");
         label.setAlignment(Align.center);
         root.add(label).growX().pad(10);
-        
+
         root.row();
         var table = new Table();
         root.add(table);
-        
+
         table.defaults().space(10f);
         var textButton = new TextButton("Save JSON", skin, "scene-med");
         table.add(textButton).fillX();
@@ -2232,19 +2249,19 @@ public class DialogSceneComposer extends Dialog {
                 if (file != null) {
                     events.exportTemplate(new FileHandle(file));
                 }
-            
+
                 if (file != null) {
                     root.hide();
                 }
             }
         });
-    
+
         var horizontalGroup = new HorizontalGroup();
         table.add(horizontalGroup).expandX().left();
-        
+
         label = new Label("A JSON file compatible with ", skin, "scene-label-colored");
         horizontalGroup.addActor(label);
-        
+
         textButton = new TextButton("SceneComposerStageBuilder", skin, "scene-link");
         horizontalGroup.addActor(textButton);
         textButton.addListener(handListener);
@@ -2254,7 +2271,7 @@ public class DialogSceneComposer extends Dialog {
                 Gdx.net.openURI("https://github.com/raeleus/stripe/blob/master/README.md");
             }
         });
-    
+
         table.row();
         textButton = new TextButton("Save to JAVA", skin, "scene-med");
         table.add(textButton).fillX();
@@ -2271,23 +2288,28 @@ public class DialogSceneComposer extends Dialog {
                 }
             }
         });
-    
-        label = new Label("A file to be added directly into your project", skin, "scene-label-colored");
+
+        label = new Label("A .java file to be added directly into your project", skin, "scene-label-colored");
         table.add(label).expandX().left();
-    
+
         table.row();
-        textButton = new TextButton("Copy to Clipboard", skin, "scene-med");
+        textButton = new TextButton("Save to KOTLIN", skin, "scene-med");
         table.add(textButton).fillX();
         textButton.addListener(handListener);
         textButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                events.exportClipboard();
-                root.hide();
+                var file = desktopWorker.saveDialog("Export Kotlin...", projectData.getLastSceneComposerJson(), "kt", "Kotlin Files (*.kt)");
+                var fileHandle = new FileHandle(file);
+                if (file != null) {
+                    if (!fileHandle.extension().equalsIgnoreCase("kt")) fileHandle = fileHandle.sibling(fileHandle.name() + ".kt");
+                    events.exportKotlin(fileHandle);
+                    root.hide();
+                }
             }
         });
-    
-        label = new Label("A minimal version to be pasted into your existing code", skin, "scene-label-colored");
+
+        label = new Label("A .kt file to be added directly into your project", skin, "scene-label-colored");
         table.add(label).expandX().left();
 
         root.show(getStage());

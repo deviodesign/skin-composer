@@ -82,6 +82,17 @@ public class DialogSceneComposerEvents {
         String clipBoard = DialogSceneComposerJavaBuilder.generateClipBoard();
         Gdx.app.getClipboard().setContents(clipBoard);
     }
+
+    public void exportKotlin(FileHandle saveFile) {
+        Main.projectData.setLastSceneComposerJson(saveFile.path());
+        String java = DialogSceneComposerKotlinBuilder.generateKotlinFile();
+        saveFile.writeString(java, false);
+    }
+
+    public void exportKotlinClipboard() {
+        String clipBoard = DialogSceneComposerKotlinBuilder.generateClipBoard();
+        Gdx.app.getClipboard().setContents(clipBoard);
+    }
     
     public void rootPackage(String packageName) {
         processUndoable(new RootPackageUndoable(packageName));
