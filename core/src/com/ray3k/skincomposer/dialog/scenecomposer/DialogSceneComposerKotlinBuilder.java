@@ -103,7 +103,7 @@ public class DialogSceneComposerKotlinBuilder {
             if (!usedVariables.contains(variableName)) builder.add("var ", classNameGetter.get(Table.class));
             builder.addStatement("%L = %T()", variableName, classNameGetter.get(Table.class));
 
-            if (table.name != null) addSetNameStatement(builder, variableName, table.name);
+            addSetNameStatement(builder, variableName, table.name);
 
             if (!table.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -112,17 +112,10 @@ public class DialogSceneComposerKotlinBuilder {
             }
 
             if (table.background != null) addSetBackgroundStatement(builder, variableName, table.background);
-            if (table.color != null) addSetColorStatement(builder, variableName, table.color);
-
-            if (table.paddingEnabled) {
-                addPadStatements(builder, variableName, table.padLeft, table.padRight, table.padTop, table.padBottom);
-            }
-
-            if (table.alignment != Align.center) {
-                addAlignStatement(builder, variableName, classNameGetter, table.alignment);
-            }
-
-            if (table.fillParent) addFSetFillParentStatement(builder, variableName);
+            if (table.color != null) addSetColorStatement(builder, variableName, table.color.getName());
+            if (table.paddingEnabled) addPadStatements(builder, variableName, table.padLeft, table.padRight, table.padTop, table.padBottom);
+            addAlignStatement(builder, variableName, classNameGetter, table.alignment);
+            if (table.fillParent) addSetFillParentStatement(builder, variableName, true);
 
             int row = 0;
             for (var cell : table.getChildren()) {
@@ -145,8 +138,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addChildAlignStatement(builder, classNameGetter, cell.alignment);
                 addChildWidthHeightAndSizeStatements(builder, cell.minWidth, cell.minHeight, cell.maxWidth, cell.maxHeight, cell.preferredWidth, cell.preferredHeight);
                 addChildUniformStatements(builder, cell.uniformX, cell.uniformY);
-
-                if (cell.colSpan > 1) addChildColSpanStatement(builder, cell.colSpan);
+                addChildColSpanStatement(builder, cell.colSpan);
 
                 builder.addStatement("");
                 if (pair != null) {
@@ -166,7 +158,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(skin%L)", variableName, classNameGetter.get(Button.class),
                 button.style.name.equals("default") ? "" : ", \"" + button.style.name + "\"");
 
-            if (button.name != null) addSetNameStatement(builder, variableName, button.name);
+            addSetNameStatement(builder, variableName, button.name);
 
             if (!button.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -176,7 +168,7 @@ public class DialogSceneComposerKotlinBuilder {
 
             if (button.checked) addSetIsCheckedStatement(builder, variableName, true);
             if (button.disabled) addSetIsDisabledStatement(builder, variableName, true);
-            if (button.color != null) addSetColorStatement(builder, variableName, button.color);
+            if (button.color != null) addSetColorStatement(builder, variableName, button.color.getName());
 
             if (!Utils.isEqual(0, button.padLeft, button.padRight, button.padTop, button.padBottom)) {
                 addPadStatements(builder, variableName, button.padLeft, button.padRight, button.padTop, button.padBottom);
@@ -193,7 +185,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(%S, skin%L)", variableName, classNameGetter.get(CheckBox.class), checkBox.text,
                 checkBox.style.name.equals("default") ? "" : ", \"" + checkBox.style.name + "\"");
 
-            if (checkBox.name != null) addSetNameStatement(builder, variableName, checkBox.name);
+            addSetNameStatement(builder, variableName, checkBox.name);
 
             if (!checkBox.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -203,7 +195,7 @@ public class DialogSceneComposerKotlinBuilder {
 
             if (checkBox.checked) addSetIsCheckedStatement(builder, variableName, true);
             if (checkBox.disabled) addSetIsDisabledStatement(builder, variableName, true);
-            if (checkBox.color != null) addSetColorStatement(builder, variableName, checkBox.color);
+            if (checkBox.color != null) addSetColorStatement(builder, variableName, checkBox.color.getName());
 
             if (!Utils.isEqual(0, checkBox.padLeft, checkBox.padRight, checkBox.padTop, checkBox.padBottom)) {
                 addPadStatements(builder, variableName, checkBox.padLeft, checkBox.padRight, checkBox.padTop, checkBox.padBottom);
@@ -218,7 +210,8 @@ public class DialogSceneComposerKotlinBuilder {
             var variableName = createVariableName("image", variables);
             if (!usedVariables.contains(variableName)) builder.add("var ");
             builder.addStatement("%L = %T(skin, %S)", variableName, classNameGetter.get(Image.class), image.drawable.name);
-            if (image.name != null) addSetNameStatement(builder, variableName, image.name);
+
+            addSetNameStatement(builder, variableName, image.name);
 
             if (!image.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -226,8 +219,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, image.touchable);
             }
 
-            if (image.scaling != null && !image.scaling.equals("stretch"))
-                addSetScalingStatement(builder, variableName, classNameGetter, image.scaling);
+            if (image.scaling != null && !image.scaling.equals("stretch")) addSetScalingStatement(builder, variableName, classNameGetter, image.scaling);
 
             return new WidgetNamePair(builder.build(), variableName);
         } else if (actor instanceof SimImageButton) {
@@ -240,7 +232,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(skin%L)", variableName, classNameGetter.get(ImageButton.class),
                 imageButton.style.name.equals("default") ? "" : ", \"" + imageButton.style.name + "\"");
 
-            if (imageButton.name != null) addSetNameStatement(builder, variableName, imageButton.name);
+            addSetNameStatement(builder, variableName, imageButton.name);
 
             if (!imageButton.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -250,7 +242,7 @@ public class DialogSceneComposerKotlinBuilder {
 
             if (imageButton.checked) addSetIsCheckedStatement(builder, variableName, true);
             if (imageButton.disabled) addSetIsDisabledStatement(builder, variableName, true);
-            if (imageButton.color != null) addSetColorStatement(builder, variableName, imageButton.color);
+            if (imageButton.color != null) addSetColorStatement(builder, variableName, imageButton.color.getName());
 
             if (!Utils.isEqual(0, imageButton.padLeft, imageButton.padRight, imageButton.padTop, imageButton.padBottom)) {
                 addPadStatements(builder, variableName, imageButton.padLeft, imageButton.padRight, imageButton.padTop, imageButton.padBottom);
@@ -267,8 +259,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(%S, skin%L)", variableName, classNameGetter.get(ImageTextButton.class), convertEscapedCharacters(imageTextButton.text),
                 imageTextButton.style.name.equals("default") ? "" : ", \"" + imageTextButton.style.name + "\"");
 
-            if (imageTextButton.name != null)
-                addSetNameStatement(builder, variableName, imageTextButton.name);
+            addSetNameStatement(builder, variableName, imageTextButton.name);
 
             if (!imageTextButton.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -278,7 +269,7 @@ public class DialogSceneComposerKotlinBuilder {
 
             if (imageTextButton.checked) addSetIsCheckedStatement(builder, variableName, true);
             if (imageTextButton.disabled) addSetIsDisabledStatement(builder, variableName, true);
-            if (imageTextButton.color != null) addSetColorStatement(builder, variableName, imageTextButton.color);
+            if (imageTextButton.color != null) addSetColorStatement(builder, variableName, imageTextButton.color.getName());
 
             if (!Utils.isEqual(0, imageTextButton.padLeft, imageTextButton.padRight, imageTextButton.padTop, imageTextButton.padBottom)) {
                 addPadStatements(builder, variableName, imageTextButton.padLeft, imageTextButton.padRight, imageTextButton.padTop, imageTextButton.padBottom);
@@ -295,7 +286,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(%S, skin%L)", variableName, classNameGetter.get(Label.class), convertEscapedCharacters(label.text),
                 label.style.name.equals("default") ? "" : ", \"" + label.style.name + "\"");
 
-            if (label.name != null) addSetNameStatement(builder, variableName, label.name);
+            addSetNameStatement(builder, variableName, label.name);
 
             if (!label.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -303,9 +294,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, label.touchable);
             }
 
-            if (label.textAlignment != Align.left) {
-                addSetAlignmentStatement(builder, variableName, classNameGetter, label.textAlignment);
-            }
+            if (label.textAlignment != Align.left) addSetAlignmentStatement(builder, variableName, classNameGetter, label.textAlignment);
 
             if (label.ellipsis && label.ellipsisString != null) {
                 if (label.ellipsisString.equals("...")) addSetEllipsisStatement(builder, variableName, true);
@@ -313,7 +302,7 @@ public class DialogSceneComposerKotlinBuilder {
             }
 
             if (label.wrap) addSetWrapStatement(builder, variableName, true);
-            if (label.color != null) addSetColorStatement(builder, variableName, label.color);
+            if (label.color != null) addSetColorStatement(builder, variableName, label.color.getName());
 
             return new WidgetNamePair(builder.build(), variableName);
         } else if (actor instanceof SimList) {
@@ -326,7 +315,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T<String>(skin%L)", variableName, classNameGetter.get(List.class),
                 list.style.name.equals("default") ? "" : ", \"" + list.style.name + "\"");
 
-            if (list.name != null) addSetNameStatement(builder, variableName, list.name);
+            addSetNameStatement(builder, variableName, list.name);
 
             if (!list.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -356,7 +345,7 @@ public class DialogSceneComposerKotlinBuilder {
                 progressBar.minimum, progressBar.maximum, progressBar.increment, progressBar.vertical,
                 progressBar.style.name.equals("default-horizontal") || progressBar.style.name.equals("default-vertical") ? "" : ", \"" + progressBar.style.name + "\"");
 
-            if (progressBar.name != null) addSetNameStatement(builder, variableName, progressBar.name);
+            addSetNameStatement(builder, variableName, progressBar.name);
 
             if (!progressBar.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -364,16 +353,11 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, progressBar.touchable);
             }
 
-            if (!MathUtils.isZero(progressBar.value)) addSetValueStatement(builder, variableName, progressBar.value);
-            if (!MathUtils.isZero(progressBar.animationDuration))
-                addSetAnimationDurationStatement(builder, variableName, progressBar.animationDuration);
-
-            if (progressBar.animateInterpolation != null && progressBar.animateInterpolation != Interpol.LINEAR)
-                addSetAnimateInterpolationStatement(builder, variableName, classNameGetter, progressBar.animateInterpolation);
-
+            addSetValueStatement(builder, variableName, progressBar.value);
+            addSetAnimationDurationStatement(builder, variableName, progressBar.animationDuration);
+            addSetAnimateInterpolationStatement(builder, variableName, classNameGetter, progressBar.animateInterpolation);
             if (!progressBar.round) addSetRoundStatement(builder, variableName, false);
-            if (progressBar.visualInterpolation != null && progressBar.visualInterpolation != Interpol.LINEAR)
-                addSetVisualInterpolationStatement(builder, variableName, classNameGetter, progressBar.visualInterpolation);
+            addSetVisualInterpolationStatement(builder, variableName, classNameGetter, progressBar.visualInterpolation);
 
             return new WidgetNamePair(builder.build(), variableName);
         } else if (actor instanceof SimSelectBox) {
@@ -386,7 +370,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T<%T>(skin%L)", variableName, classNameGetter.get(SelectBox.class),
                 classNameGetter.get(String.class), selectBox.style.name.equals("default") ? "" : ", \"" + selectBox.style.name + "\"");
 
-            if (selectBox.name != null) addSetNameStatement(builder, variableName, selectBox.name);
+            addSetNameStatement(builder, variableName, selectBox.name);
 
             if (!selectBox.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -394,7 +378,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, selectBox.touchable);
             }
 
-            if (selectBox.disabled) addSetIsDisabledStatement(builder, variableName, selectBox.disabled);
+            if (selectBox.disabled) addSetIsDisabledStatement(builder, variableName, true);
             if (selectBox.maxListCount != 0) addSetMaxListCountStatement(builder, variableName, selectBox.maxListCount);
 
             if (selectBox.list.size > 0) {
@@ -426,7 +410,7 @@ public class DialogSceneComposerKotlinBuilder {
                 slider.minimum, slider.maximum, slider.increment, slider.vertical,
                 slider.style.name.equals("default") ? "" : ", \"" + slider.style.name + "\"");
 
-            if (slider.name != null) addSetNameStatement(builder, variableName, slider.name);
+            addSetNameStatement(builder, variableName, slider.name);
 
             if (!slider.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -435,16 +419,11 @@ public class DialogSceneComposerKotlinBuilder {
             }
 
             if (slider.disabled) addSetIsDisabledStatement(builder, variableName, true);
-            if (!MathUtils.isZero(slider.value)) addSetValueStatement(builder, variableName, slider.value);
-            if (!MathUtils.isZero(slider.animationDuration))
-                addSetAnimationDurationStatement(builder, variableName, slider.animationDuration);
-
-            if (slider.animateInterpolation != null && slider.animateInterpolation != Interpol.LINEAR)
-                addSetAnimateInterpolationStatement(builder, variableName, classNameGetter, slider.animateInterpolation);
-
+            addSetValueStatement(builder, variableName, slider.value);
+            addSetAnimationDurationStatement(builder, variableName, slider.animationDuration);
+            addSetAnimateInterpolationStatement(builder, variableName, classNameGetter, slider.animateInterpolation);
             if (!slider.round) addSetRoundStatement(builder, variableName, false);
-            if (slider.visualInterpolation != null && slider.visualInterpolation != Interpol.LINEAR)
-                addSetVisualInterpolationStatement(builder, variableName, classNameGetter, slider.visualInterpolation);
+            addSetVisualInterpolationStatement(builder, variableName, classNameGetter, slider.visualInterpolation);
 
             return new WidgetNamePair(builder.build(), variableName);
         } else if (actor instanceof SimTextButton) {
@@ -457,16 +436,17 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(%S, skin%L)", variableName, classNameGetter.get(TextButton.class), convertEscapedCharacters(textButton.text),
                 textButton.style.name.equals("default") ? "" : ", \"" + textButton.style.name + "\"");
 
-            if (textButton.name != null) addSetNameStatement(builder, variableName, textButton.name);
+            addSetNameStatement(builder, variableName, textButton.name);
 
             if (!textButton.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
             } else if (textButton.touchable != Touchable.enabled) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, textButton.touchable);
             }
+
             if (textButton.checked) addSetIsCheckedStatement(builder, variableName, true);
             if (textButton.disabled) addSetIsDisabledStatement(builder, variableName, true);
-            if (textButton.color != null) addSetColorStatement(builder, variableName, textButton.color);
+            if (textButton.color != null) addSetColorStatement(builder, variableName, textButton.color.getName());
 
             if (!Utils.isEqual(0, textButton.padLeft, textButton.padRight, textButton.padTop, textButton.padBottom)) {
                 addPadStatements(builder, variableName, textButton.padLeft, textButton.padRight, textButton.padTop, textButton.padBottom);
@@ -483,7 +463,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(%S, skin%L)", variableName, classNameGetter.get(TextField.class), convertEscapedCharacters(textField.text),
                 textField.style.name.equals("default") ? "" : ", \"" + textField.style.name + "\"");
 
-            if (textField.name != null) addSetNameStatement(builder, variableName, textField.name);
+            addSetNameStatement(builder, variableName, textField.name);
 
             if (!textField.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -491,8 +471,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, textField.touchable);
             }
 
-            if (textField.passwordCharacter != '•')
-                addSetPasswordCharacterStatement(builder, variableName, textField.passwordCharacter);
+            if (textField.passwordCharacter != '•') addSetPasswordCharacterStatement(builder, variableName, textField.passwordCharacter);
             if (textField.passwordMode) addSetPasswordModeStatement(builder, variableName, true);
 
             if (textField.alignment != Align.left) {
@@ -500,8 +479,7 @@ public class DialogSceneComposerKotlinBuilder {
             }
 
             if (textField.disabled) addSetIsDisabledStatement(builder, variableName, true);
-            if (textField.cursorPosition != 0)
-                addSetCursorPositionStatement(builder, variableName, textField.cursorPosition);
+            if (textField.cursorPosition != 0) addSetCursorPositionStatement(builder, variableName, textField.cursorPosition);
 
             if (textField.selectAll) {
                 addSetSelectionStatement(builder, variableName, 0, convertEscapedCharacters(textField.text).length());
@@ -524,7 +502,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(%S, skin%L)", variableName, classNameGetter.get(TextArea.class), convertEscapedCharacters(textArea.text),
                 textArea.style.name.equals("default") ? "" : ", \"" + textArea.style.name + "\"");
 
-            if (textArea.name != null) addSetNameStatement(builder, variableName, textArea.name);
+            addSetNameStatement(builder, variableName, textArea.name);
 
             if (!textArea.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -532,8 +510,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, textArea.touchable);
             }
 
-            if (textArea.passwordCharacter != '•')
-                addSetPasswordCharacterStatement(builder, variableName, textArea.passwordCharacter);
+            if (textArea.passwordCharacter != '•') addSetPasswordCharacterStatement(builder, variableName, textArea.passwordCharacter);
             if (textArea.passwordMode) addSetPasswordModeStatement(builder, variableName, true);
 
             if (textArea.alignment != Align.left) {
@@ -566,7 +543,7 @@ public class DialogSceneComposerKotlinBuilder {
             builder.addStatement("%L = %T(%Lf, skin%L)", variableName, classNameGetter.get(Touchpad.class), touchPad.deadZone,
                 touchPad.style.name.equals("default") ? "" : ", \"" + touchPad.style.name + "\"");
 
-            if (touchPad.name != null) addSetNameStatement(builder, variableName, touchPad.name);
+            addSetNameStatement(builder, variableName, touchPad.name);
 
             if (!touchPad.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -585,7 +562,7 @@ public class DialogSceneComposerKotlinBuilder {
             if (!usedVariables.contains(variableName)) builder.add("var ");
             builder.addStatement("%L = %T<>()", variableName, classNameGetter.get(Container.class));
 
-            if (container.name != null) addSetNameStatement(builder, variableName, container.name);
+            addSetNameStatement(builder, variableName, container.name);
 
             if (!container.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -593,12 +570,11 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, container.touchable);
             }
 
-            if (container.alignment != Align.center) {
-                addAlignStatement(builder, variableName, classNameGetter, container.alignment);
-            }
-
+            addAlignStatement(builder, variableName, classNameGetter, container.alignment);
+            addAlignStatement(builder, variableName, classNameGetter, container.alignment);
             addFillStatements(builder, variableName, container.fillX, container.fillY);
-            addWidthAndHeightStatements(builder, variableName, container.minWidth, container.minHeight, container.maxWidth, container.maxHeight, container.preferredWidth, container.preferredHeight);
+            addWidthAndHeightStatements(builder, variableName, container.minWidth, container.minHeight, container.maxWidth,
+                container.maxHeight, container.preferredWidth, container.preferredHeight);
 
             if (!Utils.isEqual(0, container.padLeft, container.padRight, container.padTop, container.padBottom)) {
                 addPadStatements(builder, variableName, container.padLeft, container.padRight, container.padTop, container.padBottom);
@@ -608,7 +584,7 @@ public class DialogSceneComposerKotlinBuilder {
             if (pair != null) {
                 builder.add("\n");
                 builder.add(pair.codeBlock);
-                addSetActorStatement(builder, variableName, pair);
+                addSetActorStatement(builder, variableName, pair.name);
                 variables.removeValue(pair.name, false);
                 usedVariables.add(pair.name);
             }
@@ -622,7 +598,7 @@ public class DialogSceneComposerKotlinBuilder {
             if (!usedVariables.contains(variableName)) builder.add("var ");
             builder.addStatement("%L = %T()", variableName, classNameGetter.get(HorizontalGroup.class));
 
-            if (horizontalGroup.name != null) addSetNameStatement(builder, variableName, horizontalGroup.name);
+            addSetNameStatement(builder, variableName, horizontalGroup.name);
 
             if (!horizontalGroup.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -630,10 +606,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, horizontalGroup.touchable);
             }
 
-            if (horizontalGroup.alignment != Align.center) {
-                addAlignStatement(builder, variableName, classNameGetter, horizontalGroup.alignment);
-            }
-
+            addAlignStatement(builder, variableName, classNameGetter, horizontalGroup.alignment);
             if (horizontalGroup.expand) addExpandStatement(builder, variableName);
             if (horizontalGroup.fill) addFillStatement(builder, variableName);
 
@@ -643,15 +616,10 @@ public class DialogSceneComposerKotlinBuilder {
 
             if (horizontalGroup.reverse) addReverseStatement(builder, variableName);
 
-            if (horizontalGroup.rowAlignment != Align.center) {
-                addRowAlignStatement(builder, variableName, classNameGetter, horizontalGroup.rowAlignment);
-            }
-
-            if (!MathUtils.isZero(horizontalGroup.space))
-                addSpaceStatement(builder, variableName, horizontalGroup.space);
+            addRowAlignStatement(builder, variableName, classNameGetter, horizontalGroup.rowAlignment);
+            addSpaceStatement(builder, variableName, horizontalGroup.space);
             if (horizontalGroup.wrap) addWrapStatement(builder, variableName);
-            if (!MathUtils.isZero(horizontalGroup.wrapSpace))
-                builder.addStatement("%L.wrapSpace(%Lf)", variableName, horizontalGroup.wrapSpace);
+            addWrapSpaceStatement(builder, variableName, horizontalGroup.wrapSpace);
 
             for (var child : horizontalGroup.children) {
                 WidgetNamePair pair = createWidget(child, variables, usedVariables, classNameGetter);
@@ -685,7 +653,7 @@ public class DialogSceneComposerKotlinBuilder {
             else builder.add("skin");
             builder.addStatement("%L)", scrollPane.style.name.equals("default") ? "" : ", \"" + scrollPane.style.name + "\"");
 
-            if (scrollPane.name != null) addSetNameStatement(builder, variableName, scrollPane.name);
+            addSetNameStatement(builder, variableName, scrollPane.name);
 
             if (!scrollPane.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -696,24 +664,12 @@ public class DialogSceneComposerKotlinBuilder {
             if (!scrollPane.fadeScrollBars) addSetFadeScrollBarsStatement(builder, variableName, false);
             if (scrollPane.clamp) addSetClampStatement(builder, variableName, true);
             if (!scrollPane.flickScroll) addSetFlickScrollStatement(builder, variableName, false);
-            if (!MathUtils.isEqual(scrollPane.flingTime, 1f))
-                addSetFlingTimeStatement(builder, variableName, scrollPane.flingTime);
+            if (!MathUtils.isEqual(scrollPane.flingTime, 1f)) addSetFlingTimeStatement(builder, variableName, scrollPane.flingTime);
 
-            if (scrollPane.forceScrollX || scrollPane.forceScrollY) {
-                addSetForceScrollStatement(builder, variableName, scrollPane.forceScrollX, scrollPane.forceScrollY);
-            }
-
-            if (!scrollPane.overScrollX || !scrollPane.overScrollY) {
-                addSetOverscrollStatement(builder, variableName, scrollPane.overScrollX, scrollPane.overScrollY);
-            }
-
-            if (!MathUtils.isEqual(50f, scrollPane.overScrollDistance) || !MathUtils.isEqual(30f, scrollPane.overScrollSpeedMin) || !MathUtils.isEqual(200f, scrollPane.overScrollSpeedMax)) {
-                addSetupOverscrollStatement(builder, variableName, scrollPane.overScrollDistance, scrollPane.overScrollSpeedMin, scrollPane.overScrollSpeedMax);
-            }
-
-            if (!scrollPane.scrollBarBottom || !scrollPane.scrollBarRight) {
-                addSetScrollBarPositionsStatement(builder, variableName, scrollPane.scrollBarBottom, scrollPane.scrollBarRight);
-            }
+            addSetForceScrollStatement(builder, variableName, scrollPane.forceScrollX, scrollPane.forceScrollY);
+            addSetOverscrollStatement(builder, variableName, scrollPane.overScrollX, scrollPane.overScrollY);
+            addSetupOverscrollStatement(builder, variableName, scrollPane.overScrollDistance, scrollPane.overScrollSpeedMin, scrollPane.overScrollSpeedMax);
+            addSetScrollBarPositionsStatement(builder, variableName, scrollPane.scrollBarBottom, scrollPane.scrollBarRight);
 
             if (scrollPane.scrollBarsOnTop) addSetScrollbarsOnTopStatement(builder, variableName, true);
             if (!scrollPane.scrollBarsVisible) addSetScrollbarsVisibleStatement(builder, variableName, false);
@@ -735,7 +691,7 @@ public class DialogSceneComposerKotlinBuilder {
             if (!usedVariables.contains(variableName)) builder.add("var ");
             builder.addStatement("%L = %T()", variableName, classNameGetter.get(Stack.class));
 
-            if (stack.name != null) addSetNameStatement(builder, variableName, stack.name);
+            addSetNameStatement(builder, variableName, stack.name);
 
             if (!stack.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -781,7 +737,7 @@ public class DialogSceneComposerKotlinBuilder {
                 .add("%L, %L, %L, skin", pair1 == null ? null : pair1.name, pair2 == null ? null : pair2.name, splitPane.vertical)
                 .addStatement("%L)", splitPane.style.name.equals("default-horizontal") || splitPane.style.name.equals("default-vertical") ? "" : ", \"" + splitPane.style.name + "\"");
 
-            if (splitPane.name != null) addSetNameStatement(builder, variableName, splitPane.name);
+            addSetNameStatement(builder, variableName, splitPane.name);
 
             if (!splitPane.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -789,12 +745,9 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, splitPane.touchable);
             }
 
-            if (!MathUtils.isEqual(.5f, splitPane.split))
-                addSetSplitAmountStatement(builder, variableName, splitPane.split);
-            if (!MathUtils.isZero(splitPane.splitMin))
-                addSetMinSplitAmountStatement(builder, variableName, splitPane.splitMin);
-            if (!MathUtils.isEqual(1, splitPane.splitMax))
-                addSetMaxSplitAmountStatement(builder, variableName, splitPane.splitMax);
+            addSetSplitAmountStatement(builder, variableName, splitPane.split);
+            addSetMinSplitAmountStatement(builder, variableName, splitPane.splitMin);
+            addSetMaxSplitAmountStatement(builder, variableName, splitPane.splitMax);
 
             return new WidgetNamePair(builder.build(), variableName);
         } else if (actor instanceof SimTree) {
@@ -808,7 +761,7 @@ public class DialogSceneComposerKotlinBuilder {
                 nodeClassName, classNameGetter.get(String.class),
                 tree.style.name.equals("default") ? "" : ", \"" + tree.style.name + "\"");
 
-            if (tree.name != null) addSetNameStatement(builder, variableName, tree.name);
+            addSetNameStatement(builder, variableName, tree.name);
 
             if (!tree.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -824,13 +777,9 @@ public class DialogSceneComposerKotlinBuilder {
                 }
             }
 
-            if (!MathUtils.isEqual(2f, tree.iconSpaceLeft) || !MathUtils.isZero(2f, tree.iconSpaceRight)) {
-                addSetIconSpacingStatement(builder, variableName, tree.iconSpaceLeft, tree.iconSpaceRight);
-            }
-
-            if (!MathUtils.isZero(tree.indentSpacing))
-                addSetIndentSpacingStatement(builder, variableName, tree.indentSpacing);
-            if (!MathUtils.isEqual(4f, tree.ySpacing)) addSetYSpacingStatement(builder, variableName, tree.ySpacing);
+            addSetIconSpacingStatement(builder, variableName, tree.iconSpaceLeft, tree.iconSpaceRight);
+            addSetIndentSpacingStatement(builder, variableName, tree.indentSpacing);
+            addSetYSpacingStatement(builder, variableName, tree.ySpacing);
 
             for (var node : tree.children) {
                 var pair = createWidget(node, variables, usedVariables, classNameGetter);
@@ -884,7 +833,7 @@ public class DialogSceneComposerKotlinBuilder {
             if (!usedVariables.contains(variableName)) builder.add("var ");
             builder.addStatement("%L = %T()", variableName, classNameGetter.get(VerticalGroup.class));
 
-            if (verticalGroup.name != null) addSetNameStatement(builder, variableName, verticalGroup.name);
+            addSetNameStatement(builder, variableName, verticalGroup.name);
 
             if (!verticalGroup.visible) {
                 addSetTouchableStatement(builder, variableName, classNameGetter, Touchable.disabled);
@@ -892,10 +841,7 @@ public class DialogSceneComposerKotlinBuilder {
                 addSetTouchableStatement(builder, variableName, classNameGetter, verticalGroup.touchable);
             }
 
-            if (verticalGroup.alignment != Align.center) {
-                addAlignStatement(builder, variableName, classNameGetter, verticalGroup.alignment);
-            }
-
+            addAlignStatement(builder, variableName, classNameGetter, verticalGroup.alignment);
             if (verticalGroup.expand) addExpandStatement(builder, variableName);
             if (verticalGroup.fill) addFillStatement(builder, variableName);
 
@@ -904,15 +850,10 @@ public class DialogSceneComposerKotlinBuilder {
             }
 
             if (verticalGroup.reverse) addReverseStatement(builder, variableName);
-
-            if (verticalGroup.columnAlignment != Align.center) {
-                addColumnAlignStatement(builder, variableName, classNameGetter, verticalGroup.columnAlignment);
-            }
-
-            if (!MathUtils.isZero(verticalGroup.space)) addSpaceStatement(builder, variableName, verticalGroup.space);
+            addColumnAlignStatement(builder, variableName, classNameGetter, verticalGroup.columnAlignment);
+            addSpaceStatement(builder, variableName, verticalGroup.space);
             if (verticalGroup.wrap) addWrapStatement(builder, variableName);
-            if (!MathUtils.isZero(verticalGroup.wrapSpace))
-                addWrapSpaceStatement(builder, variableName, verticalGroup.wrapSpace);
+            addWrapSpaceStatement(builder, variableName, verticalGroup.wrapSpace);
 
             for (var child : verticalGroup.children) {
                 WidgetNamePair pair = createWidget(child, variables, usedVariables, classNameGetter);
@@ -940,6 +881,8 @@ public class DialogSceneComposerKotlinBuilder {
     }
 
     private static void addSetNameStatement(CodeBlock.Builder builder, String variableName, String name) {
+        if (name == null) return;
+
         builder.addStatement("%L.name = %S", variableName, name);
     }
 
@@ -951,11 +894,13 @@ public class DialogSceneComposerKotlinBuilder {
         builder.addStatement("%L.background = skin.getDrawable(%S)", variableName, background.name);
     }
 
-    private static void addSetColorStatement(CodeBlock.Builder builder, String variableName, ColorData color) {
-        builder.addStatement("%L.color = skin.getColor(%S)", variableName, color.getName());
+    private static void addSetColorStatement(CodeBlock.Builder builder, String variableName, String colorName) {
+        builder.addStatement("%L.color = skin.getColor(%S)", variableName, colorName);
     }
 
     private static void addWrapSpaceStatement(CodeBlock.Builder builder, String variableName, float wrapSpace) {
+        if (MathUtils.isZero(wrapSpace)) return;
+
         builder.addStatement("%L.wrapSpace(%Lf)", variableName, wrapSpace);
     }
 
@@ -980,10 +925,14 @@ public class DialogSceneComposerKotlinBuilder {
     }
 
     private static void addSetIndentSpacingStatement(CodeBlock.Builder builder, String variableName, float indentSpacing) {
+        if (MathUtils.isZero(indentSpacing)) return;
+
         builder.addStatement("%L.indentSpacing = %Lf", variableName, indentSpacing);
     }
 
     private static void addSetIconSpacingStatement(CodeBlock.Builder builder, String variableName, float iconSpaceLeft, float iconSpaceRight) {
+        if (MathUtils.isEqual(2f, iconSpaceLeft) && MathUtils.isZero(2f, iconSpaceRight)) return;
+
         builder.addStatement("%L.setIconSpacing(%Lf, %Lf)", variableName, iconSpaceLeft, iconSpaceRight);
     }
 
@@ -998,23 +947,31 @@ public class DialogSceneComposerKotlinBuilder {
     private static void addPadStatements(CodeBlock.Builder builder, String variableName, float padLeft, float padRight, float padTop, float padBottom) {
         if (Utils.isEqual(padLeft, padRight, padTop, padBottom)) {
             builder.addStatement("%L.pad(%Lf)", variableName, padLeft);
-        } else {
-            builder.addStatement("%L.padLeft(%Lf)", variableName, padLeft);
-            builder.addStatement("%L.padRight(%Lf)", variableName, padRight);
-            builder.addStatement("%L.padTop(%Lf)", variableName, padTop);
-            builder.addStatement("%L.padBottom(%Lf)", variableName, padBottom);
+
+            return;
         }
+
+        if (!MathUtils.isZero(padLeft)) builder.addStatement("%L.padLeft(%Lf)", variableName, padLeft);
+        if (!MathUtils.isZero(padRight)) builder.addStatement("%L.padRight(%Lf)", variableName, padRight);
+        if (!MathUtils.isZero(padTop)) builder.addStatement("%L.padTop(%Lf)", variableName, padTop);
+        if (!MathUtils.isZero(padBottom)) builder.addStatement("%L.padBottom(%Lf)", variableName, padBottom);
     }
 
     private static void addSetSplitAmountStatement(CodeBlock.Builder builder, String variableName, float split) {
+        if (MathUtils.isEqual(.5f, split)) return;
+
         builder.addStatement("%L.splitAmount = %L", variableName, split);
     }
 
     private static void addSetMinSplitAmountStatement(CodeBlock.Builder builder, String variableName, float splitMin) {
+        if (MathUtils.isZero(splitMin)) return;
+
         builder.addStatement("%L.minSplitAmount = %L", variableName, splitMin);
     }
 
     private static void addSetMaxSplitAmountStatement(CodeBlock.Builder builder, String variableName, float splitMax) {
+        if (MathUtils.isEqual(1, splitMax)) return;
+
         builder.addStatement("%L.maxSplitAmount = %L", variableName, splitMax);
     }
 
@@ -1051,18 +1008,26 @@ public class DialogSceneComposerKotlinBuilder {
     }
 
     private static void addSetScrollBarPositionsStatement(CodeBlock.Builder builder, String variableName, boolean scrollBarBottom, boolean scrollBarRight) {
+        if (scrollBarBottom && scrollBarRight) return;
+
         builder.addStatement("%L.setScrollBarPositions(%L, %L)", variableName, scrollBarBottom, scrollBarRight);
     }
 
     private static void addSetupOverscrollStatement(CodeBlock.Builder builder, String variableName, float overScrollDistance, float overScrollSpeedMin, float overScrollSpeedMax) {
+        if (MathUtils.isEqual(50f, overScrollDistance) && MathUtils.isEqual(30f, overScrollSpeedMin) && MathUtils.isEqual(200f, overScrollSpeedMax)) return;
+
         builder.addStatement("%L.setupOverscroll(%Lf, %Lf, %Lf)", variableName, overScrollDistance, overScrollSpeedMin, overScrollSpeedMax);
     }
 
     private static void addSetOverscrollStatement(CodeBlock.Builder builder, String variableName, boolean overScrollX, boolean overScrollY) {
+        if (overScrollX && overScrollY) return;
+
         builder.addStatement("%L.setOverscroll(%L, %L)", variableName, overScrollX, overScrollY);
     }
 
     private static void addSetForceScrollStatement(CodeBlock.Builder builder, String variableName, boolean forceScrollX, boolean forceScrollY) {
+        if (!forceScrollX && !forceScrollY) return;
+
         builder.addStatement("%L.setForceScroll(%L, %L)", variableName, forceScrollX, forceScrollY);
     }
 
@@ -1098,8 +1063,8 @@ public class DialogSceneComposerKotlinBuilder {
         builder.addStatement("%L.expand()", variableName);
     }
 
-    private static void addSetActorStatement(CodeBlock.Builder builder, String variableName, WidgetNamePair pair) {
-        builder.addStatement("%L.actor = %L", variableName, pair.name);
+    private static void addSetActorStatement(CodeBlock.Builder builder, String variableName, String actorName) {
+        builder.addStatement("%L.actor = %L", variableName, actorName);
     }
 
     private static void addWidthAndHeightStatements(CodeBlock.Builder builder, String variableName, float minWidth, float minHeight, float maxWidth, float maxHeight, float preferredWidth, float preferredHeight) {
@@ -1209,6 +1174,8 @@ public class DialogSceneComposerKotlinBuilder {
     }
 
     private static void addSetVisualInterpolationStatement(CodeBlock.Builder builder, String variableName, ClassNameGetter classNameGetter, Interpol visualInterpolation) {
+        if (visualInterpolation == null || visualInterpolation == Interpol.LINEAR) return;
+
         builder.addStatement("%L.setVisualInterpolation(%T.%L)", variableName,
             classNameGetter.get(Interpolation.class), visualInterpolation.code);
     }
@@ -1218,15 +1185,21 @@ public class DialogSceneComposerKotlinBuilder {
     }
 
     private static void addSetAnimateInterpolationStatement(CodeBlock.Builder builder, String variableName, ClassNameGetter classNameGetter, Interpol animateInterpolation) {
+        if (animateInterpolation == null || animateInterpolation == Interpol.LINEAR) return;
+
         builder.addStatement("%L.setAnimateInterpolation(%T.%L)", variableName,
             classNameGetter.get(Interpolation.class), animateInterpolation.code);
     }
 
     private static void addSetAnimationDurationStatement(CodeBlock.Builder builder, String variableName, float animationDuration) {
+        if (MathUtils.isZero(animationDuration)) return;
+
         builder.addStatement("%L.setAnimationDuration(%Lf)", variableName, animationDuration);
     }
 
     private static void addSetValueStatement(CodeBlock.Builder builder, String variableName, float value) {
+        if (MathUtils.isZero(value)) return;
+
         builder.addStatement("%L.setValue(%Lf)", variableName, value);
     }
 
@@ -1263,22 +1236,30 @@ public class DialogSceneComposerKotlinBuilder {
     }
 
     private static void addAlignStatement(CodeBlock.Builder builder, String variableName, ClassNameGetter classNameGetter, int alignment) {
+        if (alignment == Align.center) return;
+
         builder.addStatement("%L.align(%T.%L)", variableName, classNameGetter.get(Align.class), alignmentToName(alignment));
     }
 
     private static void addRowAlignStatement(CodeBlock.Builder builder, String variableName, ClassNameGetter classNameGetter, int alignment) {
+        if (alignment == Align.center) return;
+
         builder.addStatement("%L.rowAlign(%T.%L)", variableName, classNameGetter.get(Align.class), alignmentToName(alignment));
     }
 
     private static void addColumnAlignStatement(CodeBlock.Builder builder, String variableName, ClassNameGetter classNameGetter, int alignment) {
+        if (alignment == Align.center) return;
+
         builder.addStatement("%L.columnAlign(%T.%L)", variableName, classNameGetter.get(Align.class), alignmentToName(alignment));
     }
 
-    private static void addFSetFillParentStatement(CodeBlock.Builder builder, String variableName) {
-        builder.addStatement("%L.setFillParent(true)", variableName);
+    private static void addSetFillParentStatement(CodeBlock.Builder builder, String variableName, boolean fillParent) {
+        builder.addStatement("%L.setFillParent(%L)", variableName, fillParent);
     }
 
     private static void addChildColSpanStatement(CodeBlock.Builder builder, int colSpan) {
+        if (colSpan <= 1) return;
+
         builder.add(".colspan(%L)", colSpan);
     }
 
@@ -1347,15 +1328,15 @@ public class DialogSceneComposerKotlinBuilder {
             } else if (fillX) {
                 builder.add(".fillX()");
             } else if (fillY) {
-                builder.add(".fill()");
+                builder.add(".fillY()");
             }
         }
     }
 
     private static void addChildAlignStatement(CodeBlock.Builder builder, ClassNameGetter classNameGetter, int alignment) {
-        if (alignment != Align.center) {
-            builder.add(".align(%T.%L)", classNameGetter.get(Align.class), alignmentToName(alignment));
-        }
+        if (alignment == Align.center) return;
+
+        builder.add(".align(%T.%L)", classNameGetter.get(Align.class), alignmentToName(alignment));
     }
 
     private static void addChildWidthHeightAndSizeStatements(CodeBlock.Builder builder, float minWidth, float minHeight, float maxWidth, float maxHeight, float preferredWidth, float preferredHeight) {
